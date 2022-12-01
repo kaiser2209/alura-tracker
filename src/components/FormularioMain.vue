@@ -24,7 +24,7 @@
 import { TipoNotificacao } from '@/interfaces/INotificacao';
 import { key } from '@/store';
 import { NOTIFICAR } from '@/store/mutations-type';
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import { useStore } from 'vuex';
 import Temporizador from './Temporizador.vue';
 
@@ -34,39 +34,29 @@ export default defineComponent({
     components: {
         Temporizador
     },
-    data() {
-        return {
-            descricao: '',
-            idProjeto: ''
-        }
-    },
-    methods: {
-        finalizarTarefa(tempoDecorrido: number): void {
-            const projeto = this.projetos.find(projeto => projeto.id == this.idProjeto);
 
-            if(!projeto) {
-                this.store.commit(NOTIFICAR, {
-                    titulo: 'Erro ao salvar tarefa',
-                    texto: 'Selecione um projeto antes de finalizar a tarefa',
-                    tipo: TipoNotificacao.FALHA
-                })
-
-                return;
-            }
-
-            this.$emit('aoSalvarTarefa', {
-                duracaoEmSegundos: tempoDecorrido,
-                descricao: this.descricao,
-                projeto: this.projetos.find(projeto => projeto.id == this.idProjeto)
-            });
-            this.descricao = '';
-        }
-    },
-    setup() {
+    setup(props, { emit }) {
         const store = useStore(key);
+        const descricao = ref('');
+        const idProjeto = ref('');
+
+        const projetos = computed(() => store.state.projeto.projetos)
+
+        const finalizarTarefa = (tempoDecorrido: number): void => {
+            emit('aoSalvarTarefa', {
+                duracaoEmSegundos: tempoDecorrido,
+                descricao: descricao.value,
+                projeto: projetos.value.find(projeto => projeto.id == idProjeto.value)
+            });
+            descricao.value = '';
+        }
+
         return {
-            projetos: computed(() => store.state.projetos),
-            store
+            projetos,
+            store,
+            idProjeto,
+            descricao,
+            finalizarTarefa
         }
     }
 });

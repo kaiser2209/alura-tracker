@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'CronometroSimples',
@@ -17,11 +17,14 @@ export default defineComponent({
             default: 0
         }
     },
-    computed: {
-        tempoDecorrido (): string {
-            return new Date(this.tempoEmSegundos * 1000).toISOString().substring(11, 19);
+
+    setup(props) {
+        const tempoDecorrido = computed(() => new Date(props.tempoEmSegundos * 1000).toISOString().substring(11, 19));
+
+        return {
+            tempoDecorrido
         }
-    },
+    }
 });
 </script>
 

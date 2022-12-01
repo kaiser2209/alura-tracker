@@ -1,6 +1,6 @@
 <template>
     <Box>
-        <div class="columns">
+        <div class="columns clickable" @click="tarefaClicada">
             <div class="column is-4">
                 {{ tarefa.descricao || 'Tarefa sem descrição' }}
             </div>
@@ -22,6 +22,7 @@ import Box from './Box.vue';
 
 export default defineComponent({
     name: 'Tarefa',
+    emits: ['aoTarefaClicada'],
     props: {
         tarefa: {
             type: Object as PropType<ITarefa>,
@@ -31,10 +32,22 @@ export default defineComponent({
     components: {
         CronometroSimples,
         Box
+    },
+    
+    setup(props, { emit }) {
+        const tarefaClicada = () => {
+            emit('aoTarefaClicada', props.tarefa);
+        }
+
+        return {
+            tarefaClicada
+        }
     }
 });
 </script>
 
 <style scoped>
-
+.clickable {
+    cursor: pointer;
+}
 </style>
